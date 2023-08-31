@@ -19,6 +19,19 @@ func (d *Decoder) Byte(buf []byte, off int) (byte, int, error) {
 	return buf[off], off + 1, nil
 }
 
+func (d *Decoder) Uint16(buf []byte, off int) (uint16, int, error) {
+	if off+2 > len(buf) {
+		return 0, off, errors.New("overflow unpacking uint16")
+	}
+	u := d.ByteOrder.Uint16(buf[off : off+2])
+	return u, off + 2, nil
+}
+
+func (d *Decoder) Uint16AsInt(buf []byte, off int) (int, int, error) {
+	i, o, err := d.Uint16(buf, off)
+	return int(i), o, err
+}
+
 func (d *Decoder) Uint32(buf []byte, off int) (uint32, int, error) {
 	if off+4 > len(buf) {
 		return 0, off, errors.New("overflow unpacking uint32")
