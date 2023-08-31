@@ -3,6 +3,7 @@ package bpfevents
 import (
 	"encoding/binary"
 	"errors"
+	"net"
 
 	"golang.org/x/sys/unix"
 )
@@ -49,11 +50,19 @@ func (d *Decoder) Int64(buf []byte, off int) (int64, int, error) {
 	return int64(i), o, err
 }
 
-func (e *Decoder) Str(buf []byte, off, sz int) (string, int, error) {
+func (d *Decoder) Str(buf []byte, off, sz int) (string, int, error) {
 	if off+sz > len(buf) {
 		return "", off, errors.New("overflow unpacking string")
 	}
 	s := make([]byte, sz)
 	_ = copy(s, buf[off:off+sz])
 	return unix.ByteSliceToString(s), off + sz, nil
+}
+
+func (d *Decoder) IPv4(buf []byte, off int) (net.IP, int, error) {
+	if off+4 > len(buf) {
+		return nil, off, errors.New("overflow unpacking IPv4")
+	}
+	ip := net.IP(buf[off : off+4])
+	return ip, off + 4, nil
 }
