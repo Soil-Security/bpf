@@ -1,6 +1,7 @@
 package encoding
 
 import (
+	"bytes"
 	"encoding/binary"
 	"errors"
 	"net"
@@ -70,6 +71,23 @@ func (d *Decoder) Str(buf []byte, off, sz int) (string, int, error) {
 	s := make([]byte, sz)
 	_ = copy(s, buf[off:off+sz])
 	return unix.ByteSliceToString(s), off + sz, nil
+}
+
+func (e *Decoder) Strs(buf []byte, off, sz int) ([]string, int, error) {
+	if off+sz > len(buf) {
+		return nil, off, errors.New("overflow unpacking []string")
+	}
+	copiedBuf := make([]byte, sz)
+	var strs []string
+	_ = copy(copiedBuf, buf[off:off+sz])
+	slices := bytes.Split(copiedBuf, []byte{0})
+	for _, slice := range slices {
+		if len(slice) == 0 {
+			continue
+		}
+		strs = append(strs, unix.ByteSliceToString(slice))
+	}
+	return strs, off + sz, nil
 }
 
 func (d *Decoder) IPv4(buf []byte, off int) (net.IP, int, error) {
