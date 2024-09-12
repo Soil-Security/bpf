@@ -1,5 +1,5 @@
-module danielpacak/bpf-go-events
+module github.com/Soil-Security/bpf
 
-go 1.21
+go 1.23
 
 require golang.org/x/sys v0.11.0

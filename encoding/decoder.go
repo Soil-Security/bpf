@@ -1,4 +1,4 @@
-package bpfevents
+package encoding
 
 import (
 	"encoding/binary"
